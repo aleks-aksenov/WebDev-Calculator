@@ -70,6 +70,16 @@
         }
     })
 
+    const equalsButton = document.querySelector(".equals")
+    equalsButton.addEventListener("click", function () {
+        if (screen.innerText === "0" || operator === null) {
+            return
+        }
+
+        screen.innerText = doMath()
+        resetInnerState()
+    })
+
     const operatorButtons = document.querySelectorAll(
         ".operator-button:not(.equals)"
     )
@@ -80,12 +90,14 @@
                 (operator !== operatorButton.innerText && !isNewNumEntered)
             ) {
                 resetOperatorButtons()
-                operator = operatorButton.innerText
                 operatorButton.style.backgroundColor = "white"
                 operatorButton.style.color = "#df974c"
+
                 isReadyForNewNum = true
                 isNewNumEntered = false
+
                 operand = screen.innerText
+                operator = operatorButton.innerText
                 return
             }
 
@@ -99,35 +111,28 @@
 
                 operatorButton.style.backgroundColor = "white"
                 operatorButton.style.color = "#df974c"
+
                 isReadyForNewNum = true
                 isNewNumEntered = false
+
                 screen.innerText = doMath()
-                operator = operatorButton.innerText
                 operand = screen.innerText
+                operator = operatorButton.innerText
             }
         })
     )
-
-    const equalsButton = document.querySelector(".equals")
-    equalsButton.addEventListener("click", function () {
-        if (screen.innerText === "0" || operator === null) {
-            return
-        }
-
-        screen.innerText = doMath()
-        resetInnerState()
-    })
-
     const buttons = document.querySelectorAll(
         ".calc-button:not(.operator-button, .clear, .backspace)"
     )
     buttons.forEach((button) =>
         button.addEventListener("click", function () {
             if (screen.innerText === "0" || isReadyForNewNum) {
-                screen.innerText = button.innerText
+                resetOperatorButtons()
+
                 isReadyForNewNum = false
                 isNewNumEntered = true
-                resetOperatorButtons()
+
+                screen.innerText = button.innerText
                 return
             }
             screen.insertAdjacentHTML("beforeend", button.innerText)
