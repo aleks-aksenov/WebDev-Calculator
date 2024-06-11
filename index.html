@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="styles.css" />
+        <script type="text/javascript" src="./calculator.js"></script>
+        <title>Calculator</title>
+    </head>
+    <body>
+        <section class="calc">
+            <section class="screen">0</section>
+            <section class="calc-buttons">
+                <div class="calc-button-row">
+                    <button class="calc-button double clear">C</button>
+                    <button class="calc-button backspace">←</button>
+                    <button class="calc-button operator-button">÷</button>
+                </div>
+                <div class="calc-button-row">
+                    <button class="calc-button">7</button>
+                    <button class="calc-button">8</button>
+                    <button class="calc-button">9</button>
+                    <button class="calc-button operator-button">×</button>
+                </div>
+                <div class="calc-button-row">
+                    <button class="calc-button">4</button>
+                    <button class="calc-button">5</button>
+                    <button class="calc-button">6</button>
+                    <button class="calc-button operator-button">–</button>
+                </div>
+                <div class="calc-button-row">
+                    <button class="calc-button">1</button>
+                    <button class="calc-button">2</button>
+                    <button class="calc-button">3</button>
+                    <button class="calc-button operator-button">+</button>
+                </div>
+                <div class="calc-button-row">
+                    <button class="calc-button triple">0</button>
+                    <button class="calc-button operator-button equals">
+                        =
+                    </button>
+                </div>
+            </section>
+        </section>
+    </body>
+</html>
+
+<script>
+    let operand = 0
+    let operator = null
+    let isReadyForNewNum = true
+    let isNewNumEntered = false
+
+    const screen = document.querySelector(".screen")
+
+    const clearButton = document.querySelector(".clear")
+    clearButton.addEventListener("click", function () {
+        resetCalculator()
+    })
+
+    const backspaceButton = document.querySelector(".backspace")
+    backspaceButton.addEventListener("click", function () {
+        if (screen.innerText.length === 1) {
+            screen.innerText = "0"
+        } else {
+            screen.innerText = screen.innerText.substring(
+                0,
+                screen.innerText.length - 1
+            )
+        }
+    })
+
+    const operatorButtons = document.querySelectorAll(
+        ".operator-button:not(.equals)"
+    )
+    operatorButtons.forEach((operatorButton) =>
+        operatorButton.addEventListener("click", function () {
+            if (
+                operator === null ||
+                (operator !== operatorButton.innerText && !isNewNumEntered)
+            ) {
+                resetOperatorButtons()
+                operator = operatorButton.innerText
+                operatorButton.style.backgroundColor = "white"
+                operatorButton.style.color = "#df974c"
+                isReadyForNewNum = true
+                isNewNumEntered = false
+                operand = screen.innerText
+                return
+            }
+
+            if (operator !== null) {
+                resetOperatorButtons()
+                if (operator === operatorButton.innerText && !isNewNumEntered) {
+                    isReadyForNewNum = false
+                    operator = null
+                    return
+                }
+
+                operatorButton.style.backgroundColor = "white"
+                operatorButton.style.color = "#df974c"
+                isReadyForNewNum = true
+                isNewNumEntered = false
+                screen.innerText = doMath()
+                operator = operatorButton.innerText
+                operand = screen.innerText
+            }
+        })
+    )
+
+    const equalsButton = document.querySelector(".equals")
+    equalsButton.addEventListener("click", function () {
+        if (screen.innerText === "0" || operator === null) {
+            return
+        }
+
+        screen.innerText = doMath()
+        resetInnerState()
+    })
+
+    const buttons = document.querySelectorAll(
+        ".calc-button:not(.operator-button, .clear, .backspace)"
+    )
+    buttons.forEach((button) =>
+        button.addEventListener("click", function () {
+            if (screen.innerText === "0" || isReadyForNewNum) {
+                screen.innerText = button.innerText
+                isReadyForNewNum = false
+                isNewNumEntered = true
+                resetOperatorButtons()
+                return
+            }
+            screen.insertAdjacentHTML("beforeend", button.innerText)
+        })
+    )
+
+    function doMath() {
+        const num1 = Number.parseInt(operand)
+        const num2 = Number.parseInt(screen.innerText)
+        let result = 0
+
+        switch (operator) {
+            case "+":
+                result = num1 + num2
+                break
+            case "–":
+                result = num1 - num2
+                break
+            case "×":
+                result = num1 * num2
+                break
+            case "÷":
+                result = num1 / num2
+                break
+        }
+
+        return result
+    }
+
+    function resetOperatorButtons() {
+        operatorButtons.forEach((operatorButton) => {
+            operatorButton.style.backgroundColor = "#df974c"
+            operatorButton.style.color = "white"
+        })
+    }
+
+    function resetScreen() {
+        screen.innerText = "0"
+    }
+
+    function resetCalculator() {
+        resetScreen()
+        resetInnerState()
+        resetOperatorButtons()
+    }
+
+    function resetInnerState() {
+        operand = 0
+        operator = null
+        isReadyForNewNum = true
+        isNewNumEntered = false
+    }
+</script>
